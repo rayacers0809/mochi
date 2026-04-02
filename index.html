@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모찌서버 — Mochi RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --white:#ffffff;
+    --off-white:#fff7f8;
+    --light:#fde8ed;
+    --mid:#f0b8c5;
+    --pink:#f4849e;
+    --pink-deep:#e8607e;
+    --peach:#f9a87a;
+    --text:#2d1a20;
+    --text-muted:#9e7480;
+    --radius:16px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans KR',sans-serif;background:#1a0f12;color:var(--white);font-weight:300;overflow-x:hidden;min-height:100vh}
+
+  /* ── 배경 레이어 ── */
+  #bgWrap{
+    position:fixed;inset:0;z-index:0;
+    background:#1a0f12;
+  }
+  #bgVideo,#bgImage{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;display:none;
+  }
+  /* 블러 + 어두운 핑크 오버레이 */
+  #bgOverlay{
+    position:absolute;inset:0;
+    background:linear-gradient(
+      160deg,
+      rgba(26,10,18,.72) 0%,
+      rgba(40,12,22,.68) 50%,
+      rgba(26,10,18,.78) 100%
+    );
+    backdrop-filter:blur(2px);
+  }
+
+  /* ── 전체 콘텐츠 z-index ── */
+  nav,section,.page-header,.main,footer{position:relative;z-index:10}
+
+  /* ── NAV ── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;height:68px;
+    background:rgba(20,8,14,.55);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(244,132,158,.15);
+    transition:box-shadow .3s;
+  }
+  .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .nav-logo img{width:38px;height:38px;border-radius:10px;object-fit:cover;display:none}
+  .nav-logo-text{
+    font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;
+    background:linear-gradient(135deg,var(--pink),var(--peach));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .nav-links{display:flex;gap:28px;list-style:none;align-items:center}
+  .nav-links a{font-size:13px;font-weight:400;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s}
+  .nav-links a:hover{color:var(--white)}
+  .nav-cta{
+    background:linear-gradient(135deg,var(--pink),var(--peach))!important;
+    color:var(--white)!important;padding:9px 22px;border-radius:100px;
+    font-size:13px!important;font-weight:700!important;
+    box-shadow:0 4px 20px rgba(244,132,158,.4);
+    transition:opacity .2s,transform .15s!important;
+  }
+  .nav-cta:hover{opacity:.88;transform:translateY(-1px);color:var(--white)!important}
+
+  /* ── HERO ── */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;padding:120px 24px 80px;
+    position:relative;
+  }
+
+  .hero::after{content:'🌸';position:absolute;top:130px;right:10%;font-size:28px;opacity:.15;animation:float 4s ease-in-out infinite}
+  .deco-heart{position:absolute;bottom:160px;left:9%;font-size:22px;opacity:.12;animation:float 5s ease-in-out infinite reverse}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  .hero-logo{
+    width:130px;height:130px;border-radius:28px;object-fit:cover;
+    box-shadow:0 8px 40px rgba(244,132,158,.35),0 2px 12px rgba(0,0,0,.4);
+    margin-bottom:28px;animation:fadeUp .7s ease both;display:none;
+    border:2px solid rgba(244,132,158,.3);
+  }
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(244,132,158,.3);
+    padding:6px 16px;border-radius:100px;
+    font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(255,255,255,.7);margin-bottom:22px;
+    animation:fadeUp .7s .05s ease both;
+    backdrop-filter:blur(8px);
+  }
+  .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(244,132,158,.5)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(244,132,158,0)}}
+
+  .hero h1{
+    font-family:'Nunito',sans-serif;
+    font-size:clamp(44px,7vw,88px);
+    font-weight:900;line-height:1.05;letter-spacing:-.03em;
+    color:var(--white);margin-bottom:18px;
+    animation:fadeUp .7s .1s ease both;
+    text-shadow:0 4px 32px rgba(0,0,0,.5);
+  }
+  .hero h1 .grad{
+    background:linear-gradient(135deg,var(--pink),var(--peach));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero-sub{
+    font-size:16px;font-weight:300;
+    color:rgba(255,255,255,.65);
+    max-width:440px;line-height:1.85;margin-bottom:40px;
+    animation:fadeUp .7s .15s ease both;
+    text-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  .hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s .2s ease both}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--pink),var(--peach));color:var(--white);
+    padding:14px 34px;border-radius:100px;font-size:14px;font-weight:700;
+    text-decoration:none;box-shadow:0 6px 24px rgba(244,132,158,.45);
+    transition:opacity .2s,transform .15s;letter-spacing:.01em;
+  }
+  .btn-primary:hover{opacity:.88;transform:translateY(-2px)}
+  .btn-secondary{
+    background:rgba(255,255,255,.1);color:var(--white);
+    padding:14px 34px;border-radius:100px;font-size:14px;font-weight:600;
+    text-decoration:none;border:1.5px solid rgba(255,255,255,.25);
+    transition:border-color .2s,transform .15s,background .2s;
+    backdrop-filter:blur(8px);
+  }
+  .btn-secondary:hover{border-color:rgba(244,132,158,.6);background:rgba(244,132,158,.12);transform:translateY(-2px)}
+
+  /* ── 서버 상태 카드 ── */
+  .server-status{
+    display:flex;align-items:center;gap:32px;margin-top:52px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(244,132,158,.2);
+    border-radius:20px;padding:20px 36px;
+    animation:fadeUp .7s .3s ease both;
+    backdrop-filter:blur(12px);
+  }
+  .ss-section{text-align:center;min-width:80px}
+  .ss-num{
+    font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;
+    background:linear-gradient(135deg,var(--pink),var(--peach));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;
+  }
+  .ss-label{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.07em;text-transform:uppercase;margin-top:5px;font-weight:500}
+  .ss-divider{width:1px;height:40px;background:rgba(244,132,158,.2)}
+  .ss-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 13px;border-radius:100px}
+  .ss-badge.online{background:rgba(45,122,45,.25);color:#6ee06e;border:1px solid rgba(110,224,110,.2)}
+  .ss-badge.offline{background:rgba(192,57,43,.2);color:#ff7c7c;border:1px solid rgba(255,124,124,.2)}
+  .ss-badge-dot{width:6px;height:6px;border-radius:50%}
+  .ss-badge.online .ss-badge-dot{background:#6ee06e;animation:pulse 2s infinite}
+  .ss-badge.offline .ss-badge-dot{background:#ff7c7c}
+
+  .server-addr{
+    margin-top:16px;font-size:13px;color:rgba(255,255,255,.4);
+    font-family:'Nunito',sans-serif;font-weight:600;letter-spacing:.02em;
+    animation:fadeUp .7s .35s ease both;
+    display:flex;align-items:center;gap:8px;
+  }
+  .addr-copy{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    border-radius:8px;padding:3px 10px;font-size:11px;
+    color:rgba(255,255,255,.5);cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;transition:all .15s;
+  }
+  .addr-copy:hover{border-color:rgba(244,132,158,.5);color:var(--pink)}
+  .addr-copy.copied{border-color:#6ee06e;color:#6ee06e}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── FOOTER ── */
+  footer{
+    background:rgba(10,4,8,.85);
+    border-top:1px solid rgba(244,132,158,.1);
+    backdrop-filter:blur(20px);
+    padding:40px 48px 32px;
+    text-align:center;
+  }
+  .footer-sns{
+    display:flex;align-items:center;justify-content:center;
+    gap:20px;margin-bottom:24px;
+  }
+  .sns-btn{
+    width:40px;height:40px;border-radius:10px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,.5);text-decoration:none;
+    transition:background .2s,border-color .2s,color .2s;font-size:18px;
+  }
+  .sns-btn:hover{background:rgba(244,132,158,.15);border-color:rgba(244,132,158,.4);color:var(--pink)}
+  .footer-divider{
+    display:flex;align-items:center;justify-content:center;gap:24px;
+    margin-bottom:20px;
+  }
+  .footer-divider a{font-size:12px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+  .footer-divider a:hover{color:rgba(255,255,255,.7)}
+  .footer-divider span{color:rgba(255,255,255,.15);font-size:12px}
+  .footer-biz{
+    font-size:11px;color:rgba(255,255,255,.25);line-height:1.9;
+    margin-bottom:20px;
+  }
+  .footer-biz span{margin:0 8px}
+  .footer-copy{font-size:11px;color:rgba(255,255,255,.2)}
+
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(244,132,158,.3);border-radius:3px}
+
+  /* ── 패치노트 페이지용 ── */
+  .page-header{
+    padding:120px 48px 48px;
+    background:rgba(20,8,14,.6);
+    border-bottom:1px solid rgba(244,132,158,.1);
+    backdrop-filter:blur(8px);
+  }
+  .page-header-inner{max-width:1100px;margin:0 auto}
+  .page-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--pink);font-weight:600;margin-bottom:10px}
+  .page-title{font-family:'Nunito',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:900;letter-spacing:-.02em;margin-bottom:10px;color:var(--white)}
+  .page-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.7}
+
+  @media(max-width:768px){
+    nav{padding:0 20px}
+    .nav-links li:not(:last-child){display:none}
+    .server-status{flex-direction:column;gap:16px;padding:20px}
+    .ss-divider{width:40px;height:1px}
+    footer{padding:32px 20px 24px}
+    .footer-biz{font-size:10px}
+  }
+</style>
+</head>
+<body>
+
+<!-- 배경 레이어 -->
+<div id="bgWrap">
+  <video id="bgVideo" autoplay muted loop playsinline></video>
+  <img id="bgImage" alt="배경">
+  <div id="bgOverlay"></div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <img id="navIcon" alt="모찌 로고">
+    <span class="nav-logo-text">모찌서버</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="patchnote.html">패치노트</a></li>
+    <li><a href="https://mochi-fivem.gitbook.io/mochi-docs" target="_blank">서버 법률 📋</a></li>
+    <li><a href="fivem://connect/fivem-mochi.kr" class="nav-cta">서버 입장 🐾</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="deco-heart">💕</span>
+  <img class="hero-logo" id="heroIcon" alt="모찌서버 로고">
+  <div class="hero-badge"><span class="hero-badge-dot"></span>서버 운영 중</div>
+  <h1>따뜻하고 즐거운<br><span class="grad">모찌서버</span></h1>
+  <p class="hero-sub">현실감 있는 세계관과 따뜻한 커뮤니티가 함께하는<br>GTA 한국 롤플레이 서버입니다.</p>
+  <div class="hero-btns">
+    <a href="fivem://connect/fivem-mochi.kr" class="btn-primary">서버 입장하기 🐾</a>
+    <a href="https://mochi-fivem.gitbook.io/mochi-docs" target="_blank" class="btn-secondary">서버 법률 보기 📋</a>
+  </div>
+
+  <!-- 실시간 서버 상태 -->
+  <div class="server-status">
+    <div class="ss-section">
+      <div id="statusBadge" class="ss-badge offline">
+        <span class="ss-badge-dot"></span>
+        <span id="statusText">확인 중...</span>
+      </div>
+    </div>
+    <div class="ss-divider"></div>
+    <div class="ss-section">
+      <div class="ss-num">
+        <span id="curPlayers">—</span>
+        <span style="font-size:18px;opacity:.4"> / </span>
+        <span id="maxPlayers" style="font-size:20px;opacity:.5">—</span>
+      </div>
+      <div class="ss-label">현재 인원</div>
+    </div>
+    <div class="ss-divider"></div>
+    <div class="ss-section">
+      <div class="ss-num" id="lastUpdated" style="font-size:13px;background:none;-webkit-text-fill-color:rgba(255,255,255,.4);font-family:'Noto Sans KR'">—</div>
+      <div class="ss-label">마지막 갱신</div>
+    </div>
+  </div>
+
+  <div class="server-addr">
+    <span>connect fivem-mochi.kr</span>
+    <button class="addr-copy" id="copyBtn" onclick="copyAddr()">복사</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+
+  <div class="footer-biz">
+    상호 후콩컴퍼니<span>|</span>대표 이상훈<span>|</span>사업자등록번호 265-04-03785<br>
+    주소 경상남도 김해시 경원로73번길 1, 6층<span>
+  </div>
+
+  <div class="footer-copy">© 2026 모찌서버. All rights reserved.</div>
+</footer>
+
+<!-- Firebase + 배경 로드 -->
+<script type="module">
+async function init() {
+  try {
+    const res = await fetch('/.netlify/functions/config');
+    const cfg = await res.json();
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getStorage, ref, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+    const app = initializeApp(cfg);
+    const storage = getStorage(app);
+
+    // 아이콘
+    try {
+      const url = await getDownloadURL(ref(storage,'site/icon.png'));
+      ['navIcon','heroIcon','footerIcon'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){el.src=url;el.style.display='';}
+      });
+    } catch {}
+
+    // 배경 영상 우선, 없으면 이미지
+    try {
+      const vUrl = await getDownloadURL(ref(storage,'site/bg_video.mp4'));
+      const vid = document.getElementById('bgVideo');
+      vid.src = vUrl; vid.style.display = 'block';
+    } catch {
+      try {
+        const iUrl = await getDownloadURL(ref(storage,'site/bg_image.jpg'));
+        const img = document.getElementById('bgImage');
+        img.src = iUrl; img.style.display = 'block';
+      } catch {}
+    }
+  } catch {}
+}
+init();
+</script>
+
+<!-- 서버 상태 + 기타 -->
+<script>
+async function fetchStatus() {
+  try {
+    const res = await fetch('/.netlify/functions/server-status', {cache:'no-store'});
+    const d = await res.json();
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'ss-badge ' + (d.online ? 'online' : 'offline');
+    document.getElementById('statusText').textContent = d.online ? '온라인' : '오프라인';
+    document.getElementById('curPlayers').textContent = d.online ? d.current : '—';
+    document.getElementById('maxPlayers').textContent = d.online && d.max ? d.max : '—';
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent =
+      `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  } catch {
+    document.getElementById('statusText').textContent = '확인 불가';
+  }
+}
+function copyAddr() {
+  navigator.clipboard.writeText('connect fivem-mochi.kr').then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent='복사됨 ✓'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='복사';btn.classList.remove('copied');},2000);
+  });
+}
+window.copyAddr = copyAddr;
+fetchStatus();
+setInterval(fetchStatus, 30000);
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').style.boxShadow =
+    window.scrollY > 10 ? '0 4px 24px rgba(0,0,0,.4)' : 'none';
+});
+</script>
+</body>
+</html>

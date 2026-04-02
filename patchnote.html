@@ -190,7 +190,13 @@ async function init(){
   const{getStorage,ref,getDownloadURL}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
 
   let app;
-  try{ app=initializeApp(cfg); }catch(e){ app=initializeApp(cfg,'patchnote'); }
+  try{ app=initializeApp(cfg); }catch(e){ 
+    try{ app=initializeApp(cfg,'patchnote'); }catch(e2){
+      console.error('Firebase init 실패:', e2);
+      document.getElementById('sidebar').innerHTML='<div class="loading">Firebase 초기화 실패</div>';
+      return;
+    }
+  }
   const db=getFirestore(app);
   const storage=getStorage(app);
 
@@ -231,7 +237,7 @@ async function updateAssets(assetCache){
     const{initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const{getStorage,ref,getDownloadURL}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
     let app;
-    try{app=initializeApp(cfg);}catch{app=initializeApp(cfg,'assets');}
+    try{app=initializeApp(cfg);}catch{try{app=initializeApp(cfg,'assets2');}catch{return;}}
     const storage=getStorage(app);
     const newAsset={...assetCache,ts:Date.now()};
     try{const url=await getDownloadURL(ref(storage,'site/icon.png'));newAsset.icon=url;const el=document.getElementById('navIcon');if(el){el.src=url;el.style.display='';}}catch{}

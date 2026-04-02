@@ -1,0 +1,17 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."
+ 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=0, must-revalidate"
+ 
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store, no-cache, must-revalidate"
+ 

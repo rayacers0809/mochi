@@ -1,7 +1,6 @@
 [build]
   functions = "netlify/functions"
-  command = "node build.js"
-  publish = "dist"
+  publish = "."
 
 [[headers]]
   for = "/*"
@@ -9,13 +8,6 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    # 정적 파일 캐싱 (1주일)
-    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    # HTML은 캐시 안 함 (항상 최신)
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
